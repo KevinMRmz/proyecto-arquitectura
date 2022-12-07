@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { UnAuthenticatedError } = require("../errors");
-const utils = require("node:util");
+const utils = require("util");
 
 const authMiddleware = async (req, res, next) => {
   const { jwt: token } = req.cookies;
