@@ -1,5 +1,6 @@
 const express = require("express");
 const hotelController = require("../controllers/hotel-controller");
+const authMiddleware = require("./../middlewares/auth-middleware");
 
 const router = express.Router();
 

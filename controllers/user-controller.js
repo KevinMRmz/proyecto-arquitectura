@@ -1,12 +1,12 @@
 const { StatusCodes } = require("http-status-codes");
-const { NotFoundError } = require("../errors");
-const UserModel = require("../models/user-model");
+const UserService = require("../services/user-services");
 
 const getAllUsers = async (req, res) => {
-  const users = await UserModel.find();
+  const users = await UserService.returnAllUsers();
 
   res.status(StatusCodes.OK).json({
     data: users,
+    results: users.length,
     sucess: true,
   });
 };
@@ -14,11 +14,7 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
   const { id } = req.params;
 
-  const user = await UserModel.findById(id);
-
-  if (!user) {
-    throw new NotFoundError("User not founded");
-  }
+  const user = await UserService.returnSingleUser(id);
 
   res.status(StatusCodes.OK).json({
     data: user,
@@ -27,9 +23,9 @@ const getUser = async (req, res) => {
 };
 
 const addUser = async (req, res) => {
-  const user = await UserModel.create({ ...req.body });
+  const user = await UserService.createUser({ ...req.body });
 
-  res.status(StatusCodes.OK).json({
+  res.status(StatusCodes.CREATED).json({
     data: user,
     sucess: "true",
   });
@@ -38,17 +34,9 @@ const addUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const { id } = req.params;
 
-  const newUser = await UserModel.findByIdAndUpdate(
-    id,
-    { ...req.body },
-    { runValidators: true, new: true }
-  );
+  const newUser = await UserService.updateUser(id, { ...req.body });
 
-  if (!newUser) {
-    throw new NotFoundError("User not founded");
-  }
-
-  res.status(StatusCodes.OK).json({
+  res.status(StatusCodes.ACCEPTED).json({
     data: newUser,
     sucess: "true",
   });
@@ -57,10 +45,10 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
-  await UserModel.findByIdAndRemove(id);
+  const userDeleted = await UserService.deleteUser(id);
 
-  res.status(StatusCodes.OK).json({
-    data: "deleted user completed",
+  res.status(StatusCodes.ACCEPTED).json({
+    data: userDeleted,
     sucess: "true",
   });
 };
